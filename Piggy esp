@@ -1,0 +1,72 @@
+-- Carregar a UI library
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+
+-- Criar a janela principal
+local Window = redzlib:MakeWindow({
+    Title = "Piggy ESP Script",
+    SubTitle = "by seu nick",
+    SaveFolder = "PiggyESP"
+})
+
+-- Botão de minimizar
+Window:AddMinimizeButton({
+    Button = {
+        Image = "rbxassetid://18751483361",
+        BackgroundTransparency = 0
+    },
+    Corner = {
+        CornerRadius = UDim.new(35, 1)
+    },
+})
+
+-- Função para criar ESP
+local function CreateESP(obj, color)
+    local billboard = Instance.new("BillboardGui", obj)
+    billboard.Name = "ItemESP"
+    billboard.Size = UDim2.new(0, 100, 0, 40)
+    billboard.AlwaysOnTop = true
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+
+    local textLabel = Instance.new("TextLabel", billboard)
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Text = obj.Name
+    textLabel.TextColor3 = color or Color3.fromRGB(0, 255, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.TextStrokeTransparency = 0.5
+    textLabel.TextScaled = true
+end
+
+-- Ativar ESP nos itens encontrados
+local function EnableItemESP()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Tool") or (obj:IsA("Model") and obj:FindFirstChild("Handle")) then
+            if not obj:FindFirstChild("ItemESP") then
+                CreateESP(obj)
+            end
+        end
+    end
+
+    -- Atualizar automaticamente se novos itens forem adicionados
+    workspace.DescendantAdded:Connect(function(obj)
+        wait(0.1)
+        if obj:IsA("Tool") or (obj:IsA("Model") and obj:FindFirstChild("Handle")) then
+            if not obj:FindFirstChild("ItemESP") then
+                CreateESP(obj)
+            end
+        end
+    end)
+end
+
+-- Adicionar botão no UI para ativar o ESP
+Window:MakeTab({
+    Name = "ESP",
+    Icon = "rbxassetid://6031075938",
+    Content = function(tab)
+        tab:AddButton({
+            Name = "Ativar ESP de Itens",
+            Callback = function()
+                EnableItemESP()
+            end
+        })
+    end
+})
