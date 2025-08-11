@@ -1,0 +1,124 @@
+-- Carregar a UI Library
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+
+-- Criar a Janela Principal
+local Window = redzlib:MakeWindow({
+    Title = "King Legacy Script : Auto Farm, Teleport & Mails",
+    SubTitle = "by Seu ID",
+    SaveFolder = "KingLegacy_RedzLib"
+})
+
+-- Botão de minimizar
+Window:AddMinimizeButton({
+    Button = {
+        Image = "rbxassetid://18751483361",
+        BackgroundTransparency = 0
+    },
+    Corner = {
+        CornerRadius = UDim.new(35, 1)
+    },
+})
+
+----------------------------------------------------
+-- AUTO FARM LEVEL
+----------------------------------------------------
+local FarmTab = Window:MakeTab({ Name = "Auto Farm" })
+local autoFarm = false
+
+FarmTab:AddToggle({
+    Name = "Auto Farm Level",
+    Default = false,
+    Callback = function(state)
+        autoFarm = state
+        while autoFarm do
+            task.wait()
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                -- Procurar inimigo mais próximo
+                local nearest = nil
+                local dist = math.huge
+                for _, mob in pairs(workspace.Enemies:GetChildren()) do
+                    if mob:FindFirstChild("HumanoidRootPart") and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                        local mag = (char.HumanoidRootPart.Position - mob.HumanoidRootPart.Position).Magnitude
+                        if mag < dist then
+                            dist = mag
+                            nearest = mob
+                        end
+                    end
+                end
+                if nearest then
+                    -- Teleportar até o inimigo
+                    char.HumanoidRootPart.CFrame = nearest.HumanoidRootPart.CFrame * CFrame.new(0, 3, 3)
+                    -- Equipar ferramenta atual
+                    local tool = player.Backpack:FindFirstChildOfClass("Tool")
+                    if tool then
+                        char.Humanoid:EquipTool(tool)
+                    end
+                    -- Atacar
+                    game:GetService("VirtualUser"):Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                    task.wait(0.2)
+                    game:GetService("VirtualUser"):Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                end
+            end
+        end
+    end
+})
+
+----------------------------------------------------
+-- TELEPORT
+----------------------------------------------------
+local TeleportTab = Window:MakeTab({ Name = "Teleporte" })
+
+local islands = {
+    ["Starter Island"] = CFrame.new(2214, 18, -745),
+    ["Pirate Island"] = CFrame.new(-375, 23, 1980),
+    ["Marine Island"] = CFrame.new(-2040, 23, 3200),
+    ["Fishman Island"] = CFrame.new(5400, -300, 1800),
+    ["Sky Island"] = CFrame.new(-500, 1200, -1500),
+    ["Second Sea Dock"] = CFrame.new(10200, 23, -2500),
+}
+
+for name, cf in pairs(islands) do
+    TeleportTab:AddButton({
+        Name = name,
+        Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf
+        end
+    })
+end
+
+----------------------------------------------------
+-- MAILS
+----------------------------------------------------
+local MailsTab = Window:MakeTab({ Name = "Mails" })
+local autoSpin = false
+local autoStoreFruits = false
+
+MailsTab:AddToggle({
+    Name = "Auto Spin Baú de Cobre",
+    Default = false,
+    Callback = function(state)
+        autoSpin = state
+        while autoSpin do
+            task.wait(5)
+            game.ReplicatedStorage.Events.SpinChest:FireServer("Copper")
+        end
+    end
+})
+
+MailsTab:AddToggle({
+    Name = "Auto Armazenar Frutas",
+    Default = false,
+    Callback = function(state)
+        autoStoreFruits = state
+        while autoStoreFruits do
+            task.wait(2)
+            for _, fruit in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                if string.find(fruit.Name, "Fruit") then
+                    game.ReplicatedStorage.Events.StoreFruit:FireServer(fruit.Name)
+                end
+            end
+        end
+    end
+})
