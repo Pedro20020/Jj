@@ -1,0 +1,105 @@
+-- Coloque este script como "LocalScript" dentro de StarterGui
+
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local player = Players.LocalPlayer
+
+-- Criar GUI principal
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "PerformanceMenu"
+screenGui.ResetOnSpawn = false
+
+-- Botão para abrir/fechar
+local toggleButton = Instance.new("TextButton", screenGui)
+toggleButton.Size = UDim2.new(0, 100, 0, 30)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.Text = "📂 Abrir Menu"
+toggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.TextSize = 14
+
+-- Frame principal
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 220, 0, 300)
+frame.Position = UDim2.new(0, 10, 0, 50)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Visible = false
+
+-- Barra de rolagem
+local scrollingFrame = Instance.new("ScrollingFrame", frame)
+scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.ScrollBarThickness = 8
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.BorderSizePixel = 0
+
+-- Título
+local title = Instance.new("TextLabel", scrollingFrame)
+title.Text = "⚙️ Menu de Desempenho"
+title.Size = UDim2.new(1, -10, 0, 30)
+title.Position = UDim2.new(0, 5, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Lista de funções
+local funcoes = {
+    {nome = "🔅 Remover Sombras", acao = function() Lighting.GlobalShadows = false end},
+    {nome = "📉 Baixar Gráficos", acao = function()
+        Lighting.FogEnd = 100
+        Lighting.Brightness = 0
+    end},
+    {nome = "🚫 Desligar Efeitos", acao = function()
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                v.Enabled = false
+            end
+        end
+    end},
+    {nome = "🔽 Reduzir Partículas", acao = function()
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") then
+                v.Rate = 1
+            end
+        end
+    end},
+    {nome = "🧹 Limpar Decalques", acao = function()
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Decal") then
+                v:Destroy()
+            end
+        end
+    end},
+    {nome = "⚡ Ativar Modo FPS", acao = function()
+        game:GetService("RenderSettings").QualityLevel = Enum.QualityLevel.Level01
+    end},
+}
+
+-- Criar botões dentro do menu
+local offsetY = 40
+for _, info in pairs(funcoes) do
+    local botao = Instance.new("TextButton", scrollingFrame)
+    botao.Size = UDim2.new(1, -20, 0, 30)
+    botao.Position = UDim2.new(0, 10, 0, offsetY)
+    botao.Text = info.nome
+    botao.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    botao.TextColor3 = Color3.new(1, 1, 1)
+    botao.Font = Enum.Font.SourceSans
+    botao.TextSize = 14
+    botao.MouseButton1Click:Connect(info.acao)
+    offsetY = offsetY + 35
+end
+
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, offsetY)
+
+-- Função de abrir/fechar
+local aberto = false
+toggleButton.MouseButton1Click:Connect(function()
+    aberto = not aberto
+    frame.Visible = aberto
+    toggleButton.Text = aberto and "📁 Fechar Menu" or "📂 Abrir Menu"
+end)
