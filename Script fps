@@ -1,0 +1,81 @@
+--[[
+Script: Menu FPS & HD (UI Flutuante)
+Compatível: Delta Executor
+Autor: Pedroucas & ChatGPT
+Uso: Apenas em servidores autorizados
+]]
+
+-- Cria a UI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIListLayout = Instance.new("UIListLayout")
+
+-- Botões
+local btn30 = Instance.new("TextButton")
+local btn60 = Instance.new("TextButton")
+local btn90 = Instance.new("TextButton")
+local btn120 = Instance.new("TextButton")
+local btnHD = Instance.new("TextButton")
+
+-- Parent
+ScreenGui.Parent = game.CoreGui
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 200, 0, 260)
+Frame.Position = UDim2.new(0.05, 0, 0.2, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+UICorner.Parent = Frame
+
+UIListLayout.Parent = Frame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+
+-- Função para criar botões
+local function criarBotao(texto, parent)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 18
+    btn.Text = texto
+    btn.Parent = parent
+    local corner = Instance.new("UICorner")
+    corner.Parent = btn
+    return btn
+end
+
+-- Criando botões
+btn30 = criarBotao("FPS 30", Frame)
+btn60 = criarBotao("FPS 60", Frame)
+btn90 = criarBotao("FPS 90", Frame)
+btn120 = criarBotao("FPS 120", Frame)
+btnHD = criarBotao("Ativar HD", Frame)
+
+-- Funções dos botões
+btn30.MouseButton1Click:Connect(function()
+    setfpscap(30)
+end)
+
+btn60.MouseButton1Click:Connect(function()
+    setfpscap(60)
+end)
+
+btn90.MouseButton1Click:Connect(function()
+    setfpscap(90)
+end)
+
+btn120.MouseButton1Click:Connect(function()
+    setfpscap(120)
+end)
+
+btnHD.MouseButton1Click:Connect(function()
+    game.Lighting.Brightness = 2
+    game.Lighting.GlobalShadows = true
+    game.Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("MeshPart") then
+            v.Material = Enum.Material.SmoothPlastic
+        end
+    end
+end)
